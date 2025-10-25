@@ -10,7 +10,7 @@ import com.example.carmaintenance.models.MaintenanceSession;
 
 @Database(
         entities = {MaintenanceSession.class, MaintenanceItem.class},
-        version = 3, // incremented version because schema changed
+        version = 4, // incremented version because maintenance items changed
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

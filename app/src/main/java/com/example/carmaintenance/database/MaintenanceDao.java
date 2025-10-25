@@ -29,13 +29,27 @@ public interface MaintenanceDao {
     @Query("SELECT * FROM maintenance_items WHERE sessionId = :sessionId ORDER BY id DESC")
     List<MaintenanceItem> getItemsForSession(int sessionId);
 
-    // Get upcoming maintenance items (those that are due *after* current odometer)
-    @Query("SELECT * FROM maintenance_items WHERE nextDue > :currentOdo ORDER BY nextDue ASC")
+    // Alias for getItemsForSession (for export functionality)
+    @Query("SELECT * FROM maintenance_items WHERE sessionId = :sessionId ORDER BY id DESC")
+    List<MaintenanceItem> getItemsBySessionId(int sessionId);
+
+    // Get upcoming maintenance items (only the next due date for each maintenance type)
+    @Query("SELECT * FROM maintenance_items WHERE nextDue > :currentOdo AND id IN " +
+           "(SELECT MAX(id) FROM maintenance_items GROUP BY itemName) ORDER BY nextDue ASC")
     List<MaintenanceItem> getUpcoming(int currentOdo);
+    
+    // Get the latest maintenance item for each type (for debugging/verification)
+    @Query("SELECT * FROM maintenance_items WHERE id IN " +
+           "(SELECT MAX(id) FROM maintenance_items GROUP BY itemName) ORDER BY itemName ASC")
+    List<MaintenanceItem> getLatestForEachType();
 
     // Get overdue maintenance items (useful for dashboard or alerts)
     @Query("SELECT * FROM maintenance_items WHERE nextDue <= :currentOdo ORDER BY nextDue ASC")
     List<MaintenanceItem> getOverdue(int currentOdo);
+
+    // Delete a specific session (will also cascade-delete items)
+    @Query("DELETE FROM maintenance_sessions WHERE id = :sessionId")
+    void deleteSession(int sessionId);
 
     // Delete all sessions (will also cascade-delete items)
     @Query("DELETE FROM maintenance_sessions")

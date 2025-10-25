@@ -39,6 +39,9 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime)
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

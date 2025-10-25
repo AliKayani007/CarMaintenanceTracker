@@ -31,7 +31,23 @@
                 android:textColor="@android:color/white"
                 android:layout_gravity="center_horizontal"
                 android:paddingTop="20dp"
-                android:paddingBottom="20dp"/>
+                android:paddingBottom="10dp"/>
+
+            <!-- Export Button -->
+            <Button
+                android:id="@+id/btnExport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Export to CSV"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp"
+
+                android:backgroundTint="@color/redAccent"
+                android:textColor="@android:color/white"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:drawableStart="@drawable/ic_export"
+                android:drawablePadding="8dp"/>
 
             <!-- Upcoming Maintenance -->
             <TextView

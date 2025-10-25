@@ -41,5 +41,38 @@
             android:textSize="13sp"
             android:layout_marginTop="2dp"/>
 
+        <!-- Action buttons for history items -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✏️ Edit"
+                android:textSize="12sp"
+                android:backgroundTint="#4CAF50"
+                android:textColor="@android:color/white"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🗑️ Delete"
+                android:textSize="12sp"
+                android:backgroundTint="#F44336"
+                android:textColor="@android:color/white"
+                android:padding="8dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

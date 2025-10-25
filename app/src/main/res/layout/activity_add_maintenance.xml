@@ -47,6 +47,50 @@
             android:textColor="@color/white"
             android:background="@drawable/rounded_input" />
 
+        <!-- Service Date Selection -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Service Date:"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/editServiceDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Select Date"
+                android:inputType="none"
+                android:padding="10dp"
+                android:textColorHint="#B0B0B0"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_input"
+                android:focusable="false"
+                android:clickable="true" />
+
+            <Button
+                android:id="@+id/btnSelectDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📅"
+                android:textSize="18sp"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="#C62828"
+                android:textColor="@android:color/white"
+                android:padding="12dp"
+                android:elevation="2dp" />
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tvSelectItems"
             android:layout_width="match_parent"
@@ -106,31 +150,6 @@
             android:text="Fuel Filter"
             android:padding="8dp" />
 
-        <!-- ✅ New Maintenance Items -->
-        <CheckBox
-            android:id="@+id/chkAirFilter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Air Filter"
-            android:textColor="@color/white"
-            android:padding="8dp" />
-
-        <CheckBox
-            android:id="@+id/chkACFilter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="AC Filter"
-            android:textColor="@color/white"
-            android:padding="8dp" />
-
-        <CheckBox
-            android:id="@+id/chkBrakeFluid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Brake Fluid"
-            android:textColor="@color/white"
-            android:padding="8dp" />
-
         <CheckBox
             android:id="@+id/chkAlignment"
             android:layout_width="match_parent"
@@ -140,18 +159,34 @@
             android:padding="8dp" />
 
         <CheckBox
-            android:id="@+id/chkBattery"
+            android:id="@+id/chkThrottleBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Battery Service"
+            android:text="Throttle Body Cleaning"
             android:textColor="@color/white"
             android:padding="8dp" />
 
         <CheckBox
-            android:id="@+id/chkTimingChain"
+            android:id="@+id/chkEngineAirFilter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Timing Chain"
+            android:text="Engine Air Filter"
+            android:textColor="@color/white"
+            android:padding="8dp" />
+
+        <CheckBox
+            android:id="@+id/chkCabinAirFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cabin Air Filter"
+            android:textColor="@color/white"
+            android:padding="8dp" />
+
+        <CheckBox
+            android:id="@+id/chkBrakePads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Brake Pads"
             android:textColor="@color/white"
             android:padding="8dp" />
 
