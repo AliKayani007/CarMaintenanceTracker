@@ -6,4 +6,14 @@
     </style>
 
     <style name="Theme.CarMaintenance" parent="Base.Theme.CarMaintenance" />
+
+    <!-- Splash screen theme - fullscreen with no status bar -->
+    <style name="Theme.CarMaintenance.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

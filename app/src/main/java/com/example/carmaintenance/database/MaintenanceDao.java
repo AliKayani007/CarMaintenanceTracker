@@ -69,4 +69,26 @@ public interface MaintenanceDao {
     // Optional: get all maintenance items across sessions (history)
     @Query("SELECT * FROM maintenance_items ORDER BY odometerDone DESC")
     List<MaintenanceItem> getAllItems();
+
+    // Dashboard queries
+    // Get total spent across all sessions
+    @Query("SELECT SUM(totalCost) FROM maintenance_sessions")
+    double getTotalSpent();
+
+    // Get the most recent session (for last service info)
+    @Query("SELECT * FROM maintenance_sessions ORDER BY date DESC LIMIT 1")
+    MaintenanceSession getLastService();
+
+    // Get total number of services
+    @Query("SELECT COUNT(*) FROM maintenance_sessions")
+    int getTotalServices();
+
+    // Get count of upcoming maintenance items
+    @Query("SELECT COUNT(*) FROM maintenance_items WHERE nextDue > :currentOdo AND id IN " +
+           "(SELECT MAX(id) FROM maintenance_items GROUP BY itemName)")
+    int getUpcomingCount(int currentOdo);
+
+    // Get count of overdue maintenance items
+    @Query("SELECT COUNT(*) FROM maintenance_items WHERE nextDue <= :currentOdo")
+    int getOverdueCount(int currentOdo);
 }

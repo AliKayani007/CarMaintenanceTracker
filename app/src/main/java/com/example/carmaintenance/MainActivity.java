@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
@@ -27,11 +28,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerUpcoming, recyclerHistory;
-    private MaintenanceAdapter upcomingAdapter, historyAdapter;
+    private RecyclerView recyclerUpcoming;
+    private MaintenanceAdapter upcomingAdapter;
     private AppDatabase db;
     private FloatingActionButton fabAdd;
-    private Button btnExport;
+    private Button btnViewHistory;
+    
+    // Dashboard views
+    private TextView tvTotalSpent, tvLastServiceOdometer, tvLastServiceCost;
+    private TextView tvTotalServices, tvUpcomingCount, tvOverdueCount;
 
     private int currentOdometer = 34000; // Temporary value until we add a settings screen later
 
@@ -42,13 +47,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Views
         recyclerUpcoming = findViewById(R.id.recyclerUpcoming);
-        recyclerHistory = findViewById(R.id.recyclerHistory);
         fabAdd = findViewById(R.id.fabAdd);
-        btnExport = findViewById(R.id.btnExport);
+        btnViewHistory = findViewById(R.id.btnViewHistory);
+        
+        // Initialize Dashboard Views
+        tvTotalSpent = findViewById(R.id.tvTotalSpent);
+        tvLastServiceOdometer = findViewById(R.id.tvLastServiceOdometer);
+        tvLastServiceCost = findViewById(R.id.tvLastServiceCost);
+        tvTotalServices = findViewById(R.id.tvTotalServices);
+        tvUpcomingCount = findViewById(R.id.tvUpcomingCount);
+        tvOverdueCount = findViewById(R.id.tvOverdueCount);
 
-        // Setup RecyclerViews
+        // Setup RecyclerView
         recyclerUpcoming.setLayoutManager(new LinearLayoutManager(this));
-        recyclerHistory.setLayoutManager(new LinearLayoutManager(this));
 
         // Database Instance
         db = AppDatabase.getInstance(this);
@@ -62,9 +73,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Export button → Export maintenance records to CSV
-        btnExport.setOnClickListener(v -> {
-            exportToExcel();
+        // View History button → Navigate to maintenance history
+        btnViewHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MaintenanceHistoryActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -79,106 +91,38 @@ public class MainActivity extends AppCompatActivity {
         // Get upcoming items (based on odometer)
         List<MaintenanceItem> upcomingList = db.maintenanceDao().getUpcoming(currentOdometer);
 
-        // Get all sessions (for history)
-        List<MaintenanceSession> historyList = db.maintenanceDao().getAllSessions();
-
-        // Use separate adapters for items and sessions
+        // Setup upcoming maintenance adapter
         upcomingAdapter = new MaintenanceAdapter(upcomingList, true, this);   // true = upcoming mode
-        historyAdapter = new MaintenanceAdapter(historyList, false, this);    // false = history mode
-
         recyclerUpcoming.setAdapter(upcomingAdapter);
-        recyclerHistory.setAdapter(historyAdapter);
+
+        // Update dashboard
+        updateDashboard();
     }
 
+    private void updateDashboard() {
+        // Get dashboard data
+        double totalSpent = db.maintenanceDao().getTotalSpent();
+        MaintenanceSession lastService = db.maintenanceDao().getLastService();
+        int totalServices = db.maintenanceDao().getTotalServices();
+        int upcomingCount = db.maintenanceDao().getUpcomingCount(currentOdometer);
+        int overdueCount = db.maintenanceDao().getOverdueCount(currentOdometer);
 
-    private void exportToExcel() {
-        try {
-            // Get all maintenance sessions
-            List<MaintenanceSession> sessions = db.maintenanceDao().getAllSessions();
+        // Update dashboard views
+        tvTotalSpent.setText(String.format("PKR %.0f", totalSpent));
+        tvTotalServices.setText(String.valueOf(totalServices));
+        tvUpcomingCount.setText(String.valueOf(upcomingCount));
+        tvOverdueCount.setText(String.valueOf(overdueCount));
 
-            // Create CSV file in app's internal storage
-            String fileName = "Maintenance_Records_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".csv";
-            File internalDir = new File(getExternalFilesDir(null), "exports");
-            if (!internalDir.exists()) {
-                internalDir.mkdirs();
-            }
-            File file = new File(internalDir, fileName);
-
-            FileWriter writer = new FileWriter(file);
-            
-            // Write CSV header
-            writer.append("Session ID,Date,Odometer,Total Cost,Notes,Item Name,Item Odometer,Next Due,Item Cost,Item Date\n");
-
-            // Write data rows
-            for (MaintenanceSession session : sessions) {
-                // Get items for this session
-                List<MaintenanceItem> sessionItems = db.maintenanceDao().getItemsBySessionId(session.id);
-                
-                if (sessionItems.isEmpty()) {
-                    // If no items, create a row with just session data
-                    writer.append(String.valueOf(session.id)).append(",");
-                    writer.append(escapeCsv(session.date)).append(",");
-                    writer.append(String.valueOf(session.odometer)).append(",");
-                    writer.append(String.valueOf(session.totalCost)).append(",");
-                    writer.append(escapeCsv(session.notes != null ? session.notes : "")).append(",");
-                    writer.append(",,,,\n"); // Empty columns for item data
-                } else {
-                    // Create a row for each item
-                    for (MaintenanceItem item : sessionItems) {
-                        writer.append(String.valueOf(session.id)).append(",");
-                        writer.append(escapeCsv(session.date)).append(",");
-                        writer.append(String.valueOf(session.odometer)).append(",");
-                        writer.append(String.valueOf(session.totalCost)).append(",");
-                        writer.append(escapeCsv(session.notes != null ? session.notes : "")).append(",");
-                        writer.append(escapeCsv(item.itemName)).append(",");
-                        writer.append(String.valueOf(item.odometerDone)).append(",");
-                        writer.append(String.valueOf(item.nextDue)).append(",");
-                        writer.append(String.valueOf(item.cost)).append(",");
-                        writer.append(escapeCsv(item.date != null ? item.date : "")).append("\n");
-                    }
-                }
-            }
-
-            writer.flush();
-            writer.close();
-
-            // Show success message and share the file
-            Toast.makeText(this, "CSV file exported successfully: " + fileName, Toast.LENGTH_LONG).show();
-            
-            // Share the file so user can save it to Downloads or share it
-            shareFile(file);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error exporting file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        // Update last service info
+        if (lastService != null) {
+            tvLastServiceOdometer.setText(String.format("%d km", lastService.odometer));
+            tvLastServiceCost.setText(String.format("PKR %.0f", lastService.totalCost));
+        } else {
+            tvLastServiceOdometer.setText("No service yet");
+            tvLastServiceCost.setText("PKR 0");
         }
     }
 
-    private void shareFile(File file) {
-        try {
-            Uri fileUri = FileProvider.getUriForFile(this, 
-                getApplicationContext().getPackageName() + ".fileprovider", file);
-            
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/csv");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            
-            startActivity(Intent.createChooser(shareIntent, "Share Maintenance Records"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error sharing file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String escapeCsv(String value) {
-        if (value == null) return "";
-        // Escape quotes and wrap in quotes if contains comma, quote, or newline
-        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
-            return "\"" + value.replace("\"", "\"\"") + "\"";
-        }
-        return value;
-    }
 
 }
 
