@@ -7,10 +7,11 @@ import androidx.room.RoomDatabase;
 
 import com.example.carmaintenance.models.MaintenanceItem;
 import com.example.carmaintenance.models.MaintenanceSession;
+import com.example.carmaintenance.models.MaintenanceImage;
 
 @Database(
-        entities = {MaintenanceSession.class, MaintenanceItem.class},
-        version = 4, // incremented version because maintenance items changed
+        entities = {MaintenanceSession.class, MaintenanceItem.class, MaintenanceImage.class},
+        version = 5, // incremented version to add MaintenanceImage entity
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

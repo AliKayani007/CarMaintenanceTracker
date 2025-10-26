@@ -203,6 +203,70 @@
             android:textColor="@color/white"
             android:background="@drawable/rounded_input" />
 
+        <!-- Image Upload Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attach Images:"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <Button
+                android:id="@+id/btnAddImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📷 Add Images"
+                android:textAllCaps="false"
+                android:backgroundTint="#4CAF50"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="5dp"
+                android:padding="12dp"
+                android:elevation="2dp" />
+
+            <Button
+                android:id="@+id/btnTakePhoto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📸 Take Photo"
+                android:textAllCaps="false"
+                android:backgroundTint="#2196F3"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="5dp"
+                android:padding="12dp"
+                android:elevation="2dp" />
+
+        </LinearLayout>
+
+        <!-- Image Preview Grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:minHeight="100dp"
+            android:maxHeight="300dp"
+            android:background="@drawable/rounded_input"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/tvImageCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No images selected"
+            android:textColor="#B0B0B0"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="center_horizontal" />
+
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"

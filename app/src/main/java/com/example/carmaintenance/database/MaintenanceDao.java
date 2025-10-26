@@ -7,6 +7,7 @@ import androidx.room.Transaction;
 
 import com.example.carmaintenance.models.MaintenanceItem;
 import com.example.carmaintenance.models.MaintenanceSession;
+import com.example.carmaintenance.models.MaintenanceImage;
 
 import java.util.List;
 
@@ -91,4 +92,29 @@ public interface MaintenanceDao {
     // Get count of overdue maintenance items
     @Query("SELECT COUNT(*) FROM maintenance_items WHERE nextDue <= :currentOdo")
     int getOverdueCount(int currentOdo);
+
+    // Image-related methods
+    // Insert a maintenance image
+    @Insert
+    long insertImage(MaintenanceImage image);
+
+    // Insert multiple maintenance images
+    @Insert
+    void insertImages(List<MaintenanceImage> images);
+
+    // Get all images for a specific session
+    @Query("SELECT * FROM maintenance_images WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    List<MaintenanceImage> getImagesForSession(int sessionId);
+
+    // Delete a specific image
+    @Query("DELETE FROM maintenance_images WHERE id = :imageId")
+    void deleteImage(int imageId);
+
+    // Delete all images for a session
+    @Query("DELETE FROM maintenance_images WHERE sessionId = :sessionId")
+    void deleteImagesForSession(int sessionId);
+
+    // Get image count for a session
+    @Query("SELECT COUNT(*) FROM maintenance_images WHERE sessionId = :sessionId")
+    int getImageCountForSession(int sessionId);
 }
