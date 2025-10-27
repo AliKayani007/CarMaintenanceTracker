@@ -1,38 +1,41 @@
 package com.example.carmaintenance;
 
+import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.core.content.FileProvider;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.carmaintenance.adapters.MaintenanceAdapter;
+import com.example.carmaintenance.adapters.TodoMaintenanceAdapter;
 import com.example.carmaintenance.database.AppDatabase;
 import com.example.carmaintenance.models.MaintenanceItem;
 import com.example.carmaintenance.models.MaintenanceSession;
+import com.example.carmaintenance.models.TodoMaintenance;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerUpcoming;
+    private RecyclerView recyclerTodo;
     private MaintenanceAdapter upcomingAdapter;
+    private TodoMaintenanceAdapter todoAdapter;
     private AppDatabase db;
     private FloatingActionButton fabAdd;
     private Button btnViewHistory;
+    private Button btnAddTodo;
     
     // Dashboard views
     private TextView tvTotalSpent, tvLastServiceOdometer, tvLastServiceCost;
@@ -47,8 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Views
         recyclerUpcoming = findViewById(R.id.recyclerUpcoming);
+        recyclerTodo = findViewById(R.id.recyclerTodo);
         fabAdd = findViewById(R.id.fabAdd);
         btnViewHistory = findViewById(R.id.btnViewHistory);
+        btnAddTodo = findViewById(R.id.btnAddTodo);
         
         // Initialize Dashboard Views
         tvTotalSpent = findViewById(R.id.tvTotalSpent);
@@ -58,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
         tvUpcomingCount = findViewById(R.id.tvUpcomingCount);
         tvOverdueCount = findViewById(R.id.tvOverdueCount);
 
-        // Setup RecyclerView
+        // Setup RecyclerViews
         recyclerUpcoming.setLayoutManager(new LinearLayoutManager(this));
+        recyclerTodo.setLayoutManager(new LinearLayoutManager(this));
 
         // Database Instance
         db = AppDatabase.getInstance(this);
@@ -78,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, MaintenanceHistoryActivity.class);
             startActivity(intent);
         });
+
+        // Add To-Do button → Show dialog to add to-do from upcoming maintenances
+        btnAddTodo.setOnClickListener(v -> showAddTodoDialog());
     }
 
     @Override
@@ -94,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
         // Setup upcoming maintenance adapter
         upcomingAdapter = new MaintenanceAdapter(upcomingList, true, this);   // true = upcoming mode
         recyclerUpcoming.setAdapter(upcomingAdapter);
+
+        // Get to-do items (incomplete only)
+        List<TodoMaintenance> todoList = db.maintenanceDao().getIncompleteTodos();
+
+        // Setup to-do adapter
+        todoAdapter = new TodoMaintenanceAdapter(todoList, this);
+        recyclerTodo.setAdapter(todoAdapter);
 
         // Update dashboard
         updateDashboard();
@@ -123,6 +139,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showAddTodoDialog() {
+        // Get upcoming maintenances
+        List<MaintenanceItem> upcomingList = db.maintenanceDao().getUpcoming(currentOdometer);
+        
+        if (upcomingList.isEmpty()) {
+            Toast.makeText(this, "No upcoming maintenances to add as to-do", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add To-Do Maintenance");
+
+        // Create spinner with upcoming maintenances
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_todo, null);
+        Spinner spinnerMaintenance = dialogView.findViewById(R.id.spinnerMaintenance);
+
+        List<String> maintenanceNames = new ArrayList<>();
+        for (MaintenanceItem item : upcomingList) {
+            maintenanceNames.add(item.itemName + " (Due at " + item.nextDue + " km)");
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, maintenanceNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMaintenance.setAdapter(adapter);
+
+        builder.setView(dialogView);
+
+        builder.setPositiveButton("Add To-Do", (dialog, which) -> {
+            int selectedPosition = spinnerMaintenance.getSelectedItemPosition();
+            if (selectedPosition >= 0 && selectedPosition < upcomingList.size()) {
+                MaintenanceItem selectedItem = upcomingList.get(selectedPosition);
+                
+                // Create todo maintenance
+                TodoMaintenance todo = new TodoMaintenance(
+                    selectedItem.itemName,
+                    selectedItem.nextDue,
+                    selectedItem.odometerDone,
+                    false,
+                    ""
+                );
+
+                db.maintenanceDao().insertTodo(todo);
+                Toast.makeText(this, "To-do maintenance added", Toast.LENGTH_SHORT).show();
+                loadData();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
 
 }
 

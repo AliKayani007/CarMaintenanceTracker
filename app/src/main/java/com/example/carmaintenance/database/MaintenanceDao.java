@@ -8,6 +8,7 @@ import androidx.room.Transaction;
 import com.example.carmaintenance.models.MaintenanceItem;
 import com.example.carmaintenance.models.MaintenanceSession;
 import com.example.carmaintenance.models.MaintenanceImage;
+import com.example.carmaintenance.models.TodoMaintenance;
 
 import java.util.List;
 
@@ -117,4 +118,29 @@ public interface MaintenanceDao {
     // Get image count for a session
     @Query("SELECT COUNT(*) FROM maintenance_images WHERE sessionId = :sessionId")
     int getImageCountForSession(int sessionId);
+
+    // Todo Maintenance methods
+    // Insert a new todo maintenance
+    @Insert
+    long insertTodo(TodoMaintenance todo);
+
+    // Get all todo maintenances
+    @Query("SELECT * FROM todo_maintenance ORDER BY nextDue ASC")
+    List<TodoMaintenance> getAllTodos();
+
+    // Get incomplete todo maintenances
+    @Query("SELECT * FROM todo_maintenance WHERE isCompleted = 0 ORDER BY nextDue ASC")
+    List<TodoMaintenance> getIncompleteTodos();
+
+    // Update todo completion status
+    @Query("UPDATE todo_maintenance SET isCompleted = :isCompleted WHERE id = :id")
+    void updateTodoStatus(int id, boolean isCompleted);
+
+    // Delete a todo
+    @Query("DELETE FROM todo_maintenance WHERE id = :id")
+    void deleteTodo(int id);
+
+    // Delete all todos
+    @Query("DELETE FROM todo_maintenance")
+    void deleteAllTodos();
 }

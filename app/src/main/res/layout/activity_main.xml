@@ -252,6 +252,42 @@
                 android:drawableStart="@drawable/ic_history"
                 android:drawablePadding="8dp"/>
 
+            <!-- To-Do Maintenance Section -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:text="To-Do Maintenance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"/>
+
+                <Button
+                    android:id="@+id/btnAddTodo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+ Add To-Do"
+                    android:textSize="14sp"
+                    android:backgroundTint="@color/redAccent"
+                    android:textColor="@android:color/white"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerTodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"/>
+
             <!-- Upcoming Maintenance -->
             <TextView
                 android:text="Upcoming Maintenance"
